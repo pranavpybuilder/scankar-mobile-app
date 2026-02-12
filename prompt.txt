@@ -1,0 +1,1442 @@
+📱 COMPLETE OFFLINE ML/CV MOBILE APP - COMPREHENSIVE PROMPT FOR CODEX
+App Name: "SCANकर"
+
+🎯 PROJECT OVERVIEW
+Build a production-ready, 100% offline, zero-cost cross-platform mobile application (iOS & Android) that uses advanced Machine Learning and Computer Vision to scan and digitize handwritten machine reading sheets with table structure preservation. The app must extract data exactly as it appears in the source image - maintaining column structure, row alignment, and table format.
+CRITICAL REQUIREMENT: When data is in columns in the image, it MUST be exported in columns. The extracted table structure must be pixel-perfect replica of the source layout.
+
+🚀 TECHNOLOGY STACK (100% FREE & OFFLINE)
+Core Framework
+
+React Native CLI (not Expo - completely free, no limitations)
+Target: Android 6.0+ and iOS 12.0+
+
+Machine Learning (ALL OFFLINE)
+
+TensorFlow Lite for React Native (@tensorflow/tfjs-react-native)
+Pre-trained models + custom trained models (embedded in app)
+Models to embed:
+
+EAST/CRAFT Text Detection Model (~25MB) - detects text regions
+TrOCR/Custom Handwriting Recognition Model (~35MB) - reads handwritten text
+TableNet Structure Recognition Model (~15MB) - understands table layout
+Image Enhancement Model (~10MB) - improves image quality
+
+
+
+Computer Vision (OFFLINE)
+
+OpenCV for React Native (react-native-opencv3) - image preprocessing
+react-native-vision-camera (v3) - camera with advanced controls
+Custom CV algorithms for:
+
+Perspective correction
+Table grid detection
+Line/column separation
+Cell boundary detection
+
+
+
+Image Processing
+
+react-native-image-manipulator - cropping, rotation, filters
+react-native-image-crop-picker - crop with manual adjustment
+react-native-fast-image - optimized image caching
+
+File Generation (OFFLINE)
+
+jsPDF - PDF generation with tables
+xlsx / exceljs - Excel generation preserving structure
+docx - Word document generation with tables
+papaparse - CSV generation
+
+Storage & State
+
+@react-native-async-storage/async-storage - local data persistence
+react-native-fs - file system operations
+React Context API - global state management
+MMKV (optional) - faster storage alternative
+
+Navigation & UI
+
+React Navigation v6 - navigation
+react-native-reanimated - smooth animations
+react-native-gesture-handler - touch gestures
+react-native-vector-icons - icon sets (MaterialIcons, FontAwesome)
+react-native-paper (optional) - Material Design components
+react-native-svg - custom graphics
+
+Utilities
+
+react-native-permissions - camera, storage permissions
+react-native-share - share files
+react-native-haptic-feedback - tactile feedback
+react-native-device-info - device information
+
+
+🧠 ML/CV ARCHITECTURE (OFFLINE PIPELINE)
+┌─────────────────────────────────────────────────────────────┐
+│                    USER CAPTURES IMAGE                       │
+│                   (react-native-vision-camera)               │
+└───────────────────────┬─────────────────────────────────────┘
+                        ↓
+┌─────────────────────────────────────────────────────────────┐
+│              PHASE 1: IMAGE PREPROCESSING                    │
+│                    (OpenCV - OFFLINE)                        │
+├─────────────────────────────────────────────────────────────┤
+│  1. Perspective Correction (dewarp/deskew)                  │
+│  2. Noise Reduction (Gaussian blur, median filter)          │
+│  3. Adaptive Thresholding (Otsu's method)                   │
+│  4. Contrast Enhancement (CLAHE)                            │
+│  5. Shadow Removal (morphological operations)                │
+│  6. Binarization (convert to black & white)                 │
+│  7. Edge Detection (Canny edge detector)                    │
+│  8. Morphological Operations (dilate/erode)                 │
+└───────────────────────┬─────────────────────────────────────┘
+                        ↓
+┌─────────────────────────────────────────────────────────────┐
+│          PHASE 2: TABLE STRUCTURE DETECTION                  │
+│              (TFLite TableNet Model - OFFLINE)               │
+├─────────────────────────────────────────────────────────────┤
+│  1. Detect table boundaries                                 │
+│  2. Identify rows (horizontal lines)                        │
+│  3. Identify columns (vertical lines)                       │
+│  4. Detect cell boundaries (grid intersections)             │
+│  5. Extract cell coordinates (x, y, width, height)          │
+│  6. Build table structure map:                              │
+│     {                                                        │
+│       rows: [array of row coordinates],                     │
+│       columns: [array of column coordinates],               │
+│       cells: [                                              │
+│         {row: 0, col: 0, x: 10, y: 20, w: 100, h: 30},     │
+│         {row: 0, col: 1, x: 110, y: 20, w: 80, h: 30},     │
+│         ...                                                  │
+│       ]                                                      │
+│     }                                                        │
+└───────────────────────┬─────────────────────────────────────┘
+                        ↓
+┌─────────────────────────────────────────────────────────────┐
+│            PHASE 3: TEXT REGION DETECTION                    │
+│            (TFLite EAST/CRAFT Model - OFFLINE)               │
+├─────────────────────────────────────────────────────────────┤
+│  1. Run EAST text detection on each cell                    │
+│  2. Get bounding boxes for text within each cell            │
+│  3. Filter overlapping detections                           │
+│  4. Sort text regions (top-to-bottom, left-to-right)        │
+│  5. Map text regions to table cells                         │
+│  6. Output: Array of text regions with cell mapping         │
+└───────────────────────┬─────────────────────────────────────┘
+                        ↓
+┌─────────────────────────────────────────────────────────────┐
+│         PHASE 4: HANDWRITING RECOGNITION (OCR)               │
+│          (TFLite TrOCR/Custom Model - OFFLINE)               │
+├─────────────────────────────────────────────────────────────┤
+│  For each detected text region:                             │
+│  1. Extract image patch                                     │
+│  2. Preprocess patch (resize, normalize)                    │
+│  3. Run through handwriting recognition model               │
+│  4. Get text prediction + confidence score                  │
+│  5. Apply post-processing:                                  │
+│     - Spell check for machine names (dictionary)            │
+│     - Validate numbers (regex patterns)                     │
+│     - Date format standardization                           │
+│  6. Map recognized text back to table structure:            │
+│     {                                                        │
+│       row: 0, col: 0, text: "LT ROOM SHAFT BFD",           │
+│       confidence: 0.92                                      │
+│     }                                                        │
+└───────────────────────┬─────────────────────────────────────┘
+                        ↓
+┌─────────────────────────────────────────────────────────────┐
+│          PHASE 5: TABLE RECONSTRUCTION                       │
+│              (Custom Algorithm - OFFLINE)                    │
+├─────────────────────────────────────────────────────────────┤
+│  1. Create 2D array matching table structure:               │
+│     [                                                        │
+│       ["Machine Name", "07/09/26", "08/02/24", ...],       │
+│       ["LT ROOM SHAFT BFD", "252000", "646438", ...],      │
+│       ["LT ROOM FLANGE BFD", "629044", "920040", ...],     │
+│       ...                                                    │
+│     ]                                                        │
+│  2. Preserve empty cells as empty strings                   │
+│  3. Maintain exact column count from image                  │
+│  4. Align data to match visual structure                    │
+│  5. Add metadata: total rows, total columns, headers        │
+└───────────────────────┬─────────────────────────────────────┘
+                        ↓
+┌─────────────────────────────────────────────────────────────┐
+│               PHASE 6: VALIDATION & CORRECTION               │
+│                  (Custom Logic - OFFLINE)                    │
+├─────────────────────────────────────────────────────────────┤
+│  1. Check for missing cells (flag with low confidence)      │
+│  2. Validate date formats in header row                     │
+│  3. Validate numerical patterns in data cells               │
+│  4. Cross-reference machine names with known dictionary     │
+│  5. Flag anomalies for user review                          │
+│  6. Calculate confidence score per cell                     │
+│  7. Overall extraction confidence score                     │
+└───────────────────────┬─────────────────────────────────────┘
+                        ↓
+┌─────────────────────────────────────────────────────────────┐
+│                  PHASE 7: USER REVIEW UI                     │
+│              (Interactive Table Editor - OFFLINE)            │
+├─────────────────────────────────────────────────────────────┤
+│  Display:                                                    │
+│  - Original image (left/top)                                │
+│  - Extracted table (right/bottom)                           │
+│  - Editable cells (tap to edit)                             │
+│  - Confidence indicators (color-coded cells):               │
+│    * Green: >90% confidence                                 │
+│    * Yellow: 70-90% confidence                              │
+│    * Red: <70% confidence (needs review)                    │
+│  - Add/remove row/column buttons                            │
+│  - Merge/split cell options                                 │
+└───────────────────────┬─────────────────────────────────────┘
+                        ↓
+┌─────────────────────────────────────────────────────────────┐
+│              PHASE 8: EXPORT WITH STRUCTURE                  │
+│                  (Multiple Formats - OFFLINE)                │
+├─────────────────────────────────────────────────────────────┤
+│  EXCEL (.xlsx):                                             │
+│  - Create workbook with exact table structure               │
+│  - Format headers (bold, background color)                  │
+│  - Auto-fit column widths                                   │
+│  - Add borders to all cells                                 │
+│  - Number formatting for numeric cells                      │
+│  - Date formatting for date cells                           │
+│                                                              │
+│  PDF:                                                        │
+│  - Generate table with jsPDF-autotable                      │
+│  - Preserve column alignment                                │
+│  - Add header styling                                       │
+│  - Auto-page breaks for large tables                        │
+│  - Add metadata (scan date, confidence score)               │
+│                                                              │
+│  WORD (.docx):                                              │
+│  - Create table with docx library                           │
+│  - Maintain structure and formatting                        │
+│  - Add table borders and shading                            │
+│  - Header row styling                                       │
+│                                                              │
+│  CSV:                                                        │
+│  - Plain comma-separated values                             │
+│  - Preserve column structure                                │
+│  - UTF-8 encoding                                           │
+│                                                              │
+│  JSON:                                                       │
+│  - Structured data format:                                  │
+│    {                                                         │
+│      "headers": ["Machine", "07/09/26", ...],              │
+│      "data": [                                              │
+│        {"Machine": "LT ROOM SHAFT BFD", "07/09/26": ...},  │
+│        ...                                                   │
+│      ],                                                      │
+│      "metadata": {...}                                      │
+│    }                                                         │
+└─────────────────────────────────────────────────────────────┘
+
+📊 TABLE STRUCTURE PRESERVATION - CRITICAL REQUIREMENTS
+EXACT STRUCTURE MATCHING
+The app MUST replicate the source table structure exactly:
+javascript// EXAMPLE: From the provided image
+
+SOURCE IMAGE TABLE:
+┌────────────────────────────┬──────────┬──────────┬──────────┬─────┐
+│ Machine Name               │ 07/09/26 │ 08/02/24 │ 09/12/24 │ ... │
+├────────────────────────────┼──────────┼──────────┼──────────┼─────┤
+│ LT ROOM SHAFT BFD          │ 252000   │ 646438   │          │ ... │
+├────────────────────────────┼──────────┼──────────┼──────────┼─────┤
+│ LT ROOM FLANGE BFD         │ 629044   │ 920040   │          │ ... │
+├────────────────────────────┼──────────┼──────────┼──────────┼─────┤
+│ LT ROOM DRIVING TOWER      │ 219043   │ 682126   │          │ ... │
+└────────────────────────────┴──────────┴──────────┴──────────┴─────┘
+
+EXPORTED EXCEL MUST BE:
+┌────────────────────────────┬──────────┬──────────┬──────────┬─────┐
+│ Machine Name               │ 07/09/26 │ 08/02/24 │ 09/12/24 │ ... │
+├────────────────────────────┼──────────┼──────────┼──────────┼─────┤
+│ LT ROOM SHAFT BFD          │ 252000   │ 646438   │          │ ... │
+├────────────────────────────┼──────────┼──────────┼──────────┼─────┤
+│ LT ROOM FLANGE BFD         │ 629044   │ 920040   │          │ ... │
+├────────────────────────────┼──────────┼──────────┼──────────┼─────┤
+│ LT ROOM DRIVING TOWER      │ 219043   │ 682126   │          │ ... │
+└────────────────────────────┴──────────┴──────────┴──────────┴─────┘
+
+IDENTICAL STRUCTURE - NO REFORMATTING!
+DATA STRUCTURE REQUIREMENTS
+javascript// Internal data representation must preserve structure
+
+const extractedData = {
+  tableStructure: {
+    rows: 47,        // Total rows detected
+    columns: 8,      // Total columns detected (1 machine name + 7 date columns)
+    hasHeader: true  // First row is header
+  },
+  
+  headers: [
+    "Machine Name",
+    "07/09/26",
+    "08/02/24", 
+    "09/12/24",
+    "10/02/26",
+    "11/02/26",
+    "12/02/26",
+    "25/12/24"
+  ],
+  
+  data: [
+    // Row 0
+    {
+      row: 0,
+      cells: [
+        { col: 0, text: "LT ROOM SHAFT BFD", confidence: 0.95 },
+        { col: 1, text: "252000", confidence: 0.88 },
+        { col: 2, text: "646438", confidence: 0.92 },
+        { col: 3, text: "", confidence: 0.0 },  // Empty cell preserved
+        { col: 4, text: "", confidence: 0.0 },
+        { col: 5, text: "", confidence: 0.0 },
+        { col: 6, text: "", confidence: 0.0 },
+        { col: 7, text: "", confidence: 0.0 }
+      ]
+    },
+    // Row 1
+    {
+      row: 1,
+      cells: [
+        { col: 0, text: "LT ROOM FLANGE BFD", confidence: 0.93 },
+        { col: 1, text: "629044", confidence: 0.90 },
+        { col: 2, text: "920040", confidence: 0.87 },
+        { col: 3, text: "", confidence: 0.0 },
+        { col: 4, text: "", confidence: 0.0 },
+        { col: 5, text: "", confidence: 0.0 },
+        { col: 6, text: "", confidence: 0.0 },
+        { col: 7, text: "", confidence: 0.0 }
+      ]
+    },
+    // ... all rows following same structure
+  ],
+  
+  metadata: {
+    scanDate: "2026-02-13T10:30:00Z",
+    overallConfidence: 0.87,
+    lowConfidenceCells: [
+      { row: 5, col: 2, confidence: 0.65 },
+      { row: 12, col: 3, confidence: 0.58 }
+    ],
+    processingTime: 4.2  // seconds
+  }
+};
+COLUMN ALIGNMENT RULES
+javascript// When exporting to Excel/PDF/Word:
+
+1. MUST preserve exact column count from source
+2. MUST maintain column order (left to right)
+3. MUST keep empty cells as empty (not "N/A" or "null")
+4. MUST align text (left for names, right for numbers)
+5. MUST preserve merged cells if detected
+6. MUST maintain consistent column widths
+7. MUST add table borders to show structure clearly
+
+// Example Excel export code structure:
+const exportToExcel = (extractedData) => {
+  const workbook = XLSX.utils.book_new();
+  
+  // Create 2D array maintaining exact structure
+  const worksheetData = [
+    extractedData.headers,  // Header row
+    ...extractedData.data.map(row => 
+      row.cells.map(cell => cell.text)  // Preserve empty strings
+    )
+  ];
+  
+  const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+  
+  // Apply formatting
+  const range = XLSX.utils.decode_range(worksheet['!ref']);
+  
+  // Format headers (row 0)
+  for (let col = range.s.c; col <= range.e.c; col++) {
+    const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+    if (worksheet[cellAddress]) {
+      worksheet[cellAddress].s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: "1976D2" } },
+        alignment: { horizontal: "center", vertical: "center" }
+      };
+    }
+  }
+  
+  // Format data cells
+  for (let row = range.s.r + 1; row <= range.e.r; row++) {
+    for (let col = range.s.c; col <= range.e.c; col++) {
+      const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+      if (worksheet[cellAddress]) {
+        worksheet[cellAddress].s = {
+          alignment: { 
+            horizontal: col === 0 ? "left" : "right",  // Names left, numbers right
+            vertical: "center" 
+          },
+          border: {
+            top: { style: "thin", color: { rgb: "000000" } },
+            bottom: { style: "thin", color: { rgb: "000000" } },
+            left: { style: "thin", color: { rgb: "000000" } },
+            right: { style: "thin", color: { rgb: "000000" } }
+          }
+        };
+      }
+    }
+  }
+  
+  // Set column widths based on content
+  worksheet['!cols'] = extractedData.headers.map((header, idx) => ({
+    wch: idx === 0 ? 30 : 12  // Machine name column wider
+  }));
+  
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Machine Readings");
+  
+  return workbook;
+};
+```
+
+---
+
+## 📱 COMPLETE PROJECT STRUCTURE
+```
+SCANकर
+├── android/                          # Android native code
+├── ios/                              # iOS native code
+├── src/
+│   ├── screens/
+│   │   ├── SplashScreen.js          # App launch animation
+│   │   ├── OnboardingScreen.js      # First-time tutorial (3 slides)
+│   │   ├── HomeScreen.js            # Dashboard with recent scans
+│   │   ├── CameraScreen.js          # Camera interface with guides
+│   │   ├── ImagePreviewScreen.js    # Crop, rotate, adjust
+│   │   ├── ProcessingScreen.js      # ML/CV processing with progress
+│   │   ├── TableEditorScreen.js     # Edit extracted table
+│   │   ├── ExportOptionsScreen.js   # Choose format & export
+│   │   ├── LibraryScreen.js         # All saved scans
+│   │   ├── DocumentDetailScreen.js  # View single document
+│   │   ├── SettingsScreen.js        # App preferences
+│   │   ├── HelpScreen.js            # User guide
+│   │   └── TrainingDataScreen.js    # Collect training data (optional)
+│   │
+│   ├── components/
+│   │   ├── ui/
+│   │   │   ├── Button.js            # Custom button component
+│   │   │   ├── Card.js              # Card container
+│   │   │   ├── Modal.js             # Custom modal
+│   │   │   ├── LoadingSpinner.js    # Loading indicator
+│   │   │   ├── ProgressBar.js       # Progress visualization
+│   │   │   ├── IconButton.js        # Icon-based button
+│   │   │   └── EmptyState.js        # Empty list placeholder
+│   │   │
+│   │   ├── camera/
+│   │   │   ├── CameraControls.js    # Flash, focus, exposure controls
+│   │   │   ├── CameraOverlay.js     # Grid and guides
+│   │   │   ├── EdgeDetectionView.js # Real-time edge highlight
+│   │   │   └── CaptureButton.js     # Large capture button
+│   │   │
+│   │   ├── editor/
+│   │   │   ├── ImageEditor.js       # Crop, rotate, adjust
+│   │   │   ├── CropTool.js          # Corner-based cropping
+│   │   │   ├── RotateTool.js        # 90° rotation controls
+│   │   │   ├── BrightnessSlider.js  # Brightness adjustment
+│   │   │   └── ContrastSlider.js    # Contrast adjustment
+│   │   │
+│   │   ├── table/
+│   │   │   ├── TableView.js         # Display extracted table
+│   │   │   ├── EditableCell.js      # Tap-to-edit cell
+│   │   │   ├── ConfidenceIndicator.js # Color-coded confidence
+│   │   │   ├── TableHeader.js       # Sticky header row
+│   │   │   ├── AddRowButton.js      # Add new row
+│   │   │   ├── AddColumnButton.js   # Add new column
+│   │   │   └── TableToolbar.js      # Table manipulation tools
+│   │   │
+│   │   ├── library/
+│   │   │   ├── DocumentCard.js      # Scan thumbnail card
+│   │   │   ├── GridView.js          # Grid layout
+│   │   │   ├── ListView.js          # List layout
+│   │   │   ├── SearchBar.js         # Search documents
+│   │   │   ├── FilterOptions.js     # Filter by date, type
+│   │   │   └── SortOptions.js       # Sort controls
+│   │   │
+│   │   └── export/
+│   │       ├── FormatSelector.js    # PDF/Excel/Word/CSV selector
+│   │       ├── TemplateSelector.js  # Saved templates
+│   │       ├── FileNameInput.js     # Custom file name
+│   │       ├── PreviewModal.js      # Preview before export
+│   │       └── ShareSheet.js        # Native share options
+│   │
+│   ├── services/
+│   │   ├── ml/
+│   │   │   ├── TFLiteService.js     # TensorFlow Lite initialization
+│   │   │   ├── TextDetectionModel.js # EAST/CRAFT text detection
+│   │   │   ├── HandwritingOCRModel.js # Handwriting recognition
+│   │   │   ├── TableStructureModel.js # Table detection
+│   │   │   ├── ImageEnhancementModel.js # Image quality improvement
+│   │   │   └── ModelLoader.js       # Load models from assets
+│   │   │
+│   │   ├── cv/
+│   │   │   ├── OpenCVService.js     # OpenCV initialization
+│   │   │   ├── ImagePreprocessor.js # All preprocessing steps
+│   │   │   ├── PerspectiveCorrector.js # Dewarp images
+│   │   │   ├── NoiseReducer.js      # Denoise algorithms
+│   │   │   ├── ThresholdingService.js # Adaptive thresholding
+│   │   │   ├── EdgeDetector.js      # Canny edge detection
+│   │   │   ├── ContourDetector.js   # Find table boundaries
+│   │   │   └── LineDetector.js      # Detect grid lines
+│   │   │
+│   │   ├── ocr/
+│   │   │   ├── OCRPipeline.js       # Complete OCR workflow
+│   │   │   ├── TextRegionExtractor.js # Extract text regions
+│   │   │   ├── CellRecognizer.js    # Recognize text in cells
+│   │   │   ├── PostProcessor.js     # Clean OCR output
+│   │   │   ├── ConfidenceCalculator.js # Calculate accuracy
+│   │   │   └── ValidationService.js # Validate extracted data
+│   │   │
+│   │   ├── table/
+│   │   │   ├── TableDetector.js     # Detect table structure
+│   │   │   ├── GridAnalyzer.js      # Analyze grid layout
+│   │   │   ├── CellBoundaryDetector.js # Find cell boundaries
+│   │   │   ├── RowColumnMapper.js   # Map cells to rows/columns
+│   │   │   ├── TableReconstructor.js # Build 2D array
+│   │   │   └── StructureValidator.js # Validate table structure
+│   │   │
+│   │   ├── export/
+│   │   │   ├── PDFExporter.js       # jsPDF implementation
+│   │   │   ├── ExcelExporter.js     # xlsx implementation
+│   │   │   ├── WordExporter.js      # docx implementation
+│   │   │   ├── CSVExporter.js       # CSV generation
+│   │   │   ├── JSONExporter.js      # JSON export
+│   │   │   └── ExportManager.js     # Coordinate all exports
+│   │   │
+│   │   ├── storage/
+│   │   │   ├── StorageService.js    # AsyncStorage wrapper
+│   │   │   ├── FileService.js       # react-native-fs wrapper
+│   │   │   ├── DocumentManager.js   # Manage saved documents
+│   │   │   ├── CacheManager.js      # Image cache management
+│   │   │   └── BackupService.js     # Backup/restore data
+│   │   │
+│   │   └── utils/
+│   │       ├── PermissionService.js # Handle permissions
+│   │       ├── ShareService.js      # Share files
+│   │       ├── PrintService.js      # Print documents
+│   │       └── AnalyticsService.js  # Local analytics (optional)
+│   │
+│   ├── utils/
+│   │   ├── imageUtils.js            # Image manipulation helpers
+│   │   ├── dateParser.js            # Parse date formats
+│   │   ├── numberValidator.js       # Validate numeric data
+│   │   ├── stringUtils.js           # String manipulation
+│   │   ├── arrayUtils.js            # Array operations
+│   │   ├── fileUtils.js             # File naming, paths
+│   │   ├── colorUtils.js            # Color manipulation
+│   │   └── mathUtils.js             # Mathematical operations
+│   │
+│   ├── navigation/
+│   │   ├── AppNavigator.js          # Main navigation stack
+│   │   ├── TabNavigator.js          # Bottom tabs (optional)
+│   │   └── navigationHelper.js      # Navigation utilities
+│   │
+│   ├── context/
+│   │   ├── AppContext.js            # Global app state
+│   │   ├── ThemeContext.js          # Theme (light/dark)
+│   │   ├── DocumentContext.js       # Document management state
+│   │   └── SettingsContext.js       # User preferences
+│   │
+│   ├── hooks/
+│   │   ├── useCamera.js             # Camera hook
+│   │   ├── useOCR.js                # OCR processing hook
+│   │   ├── useStorage.js            # Storage operations hook
+│   │   ├── useExport.js             # Export functionality hook
+│   │   ├── usePermissions.js        # Permissions hook
+│   │   └── useDebounce.js           # Debounce hook
+│   │
+│   ├── constants/
+│   │   ├── colors.js                # App color palette
+│   │   ├── fonts.js                 # Font definitions
+│   │   ├── spacing.js               # Spacing scale
+│   │   ├── config.js                # App configuration
+│   │   ├── modelPaths.js            # ML model paths
+│   │   └── fileFormats.js           # Export format configs
+│   │
+│   ├── assets/
+│   │   ├── models/                  # TFLite models (bundled)
+│   │   │   ├── text_detection.tflite
+│   │   │   ├── handwriting_ocr.tflite
+│   │   │   ├── table_structure.tflite
+│   │   │   └── image_enhancement.tflite
+│   │   │
+│   │   ├── icons/                   # Custom SVG icons
+│   │   ├── images/                  # Static images
+│   │   ├── fonts/                   # Custom fonts (if needed)
+│   │   └── animations/              # Lottie files (optional)
+│   │
+│   └── types/                       # TypeScript definitions (optional)
+│       ├── table.d.ts
+│       ├── document.d.ts
+│       └── export.d.ts
+│
+├── App.js                           # Root component
+├── index.js                         # Entry point
+├── package.json                     # Dependencies
+├── babel.config.js                  # Babel configuration
+├── metro.config.js                  # Metro bundler config
+├── .eslintrc.js                     # ESLint rules
+├── .prettierrc                      # Prettier config
+├── app.json                         # App metadata
+├── README.md                        # Documentation
+└── .env.example                     # Environment variables template
+
+🔧 KEY IMPLEMENTATION FILES
+1. OCRPipeline.js - Complete Processing Flow
+javascriptimport OpenCVService from '../cv/OpenCVService';
+import TextDetectionModel from '../ml/TextDetectionModel';
+import HandwritingOCRModel from '../ml/HandwritingOCRModel';
+import TableStructureModel from '../ml/TableStructureModel';
+import TableReconstructor from '../table/TableReconstructor';
+
+class OCRPipeline {
+  async processImage(imageUri) {
+    try {
+      // Step 1: Preprocess image with OpenCV
+      console.log('🔧 Preprocessing image...');
+      const preprocessed = await OpenCVService.preprocessImage(imageUri);
+      
+      // Step 2: Detect table structure
+      console.log('📊 Detecting table structure...');
+      const tableStructure = await TableStructureModel.detectTable(preprocessed);
+      // Returns: { rows: [...], columns: [...], cells: [...] }
+      
+      // Step 3: Detect text regions in each cell
+      console.log('🔍 Detecting text regions...');
+      const textRegions = await TextDetectionModel.detectTextInCells(
+        preprocessed,
+        tableStructure.cells
+      );
+      
+      // Step 4: Recognize handwriting in each text region
+      console.log('✍️ Recognizing handwriting...');
+      const recognizedText = await HandwritingOCRModel.recognizeBatch(
+        preprocessed,
+        textRegions
+      );
+      
+      // Step 5: Reconstruct table with recognized text
+      console.log('🏗️ Reconstructing table...');
+      const reconstructedTable = await TableReconstructor.buildTable(
+        tableStructure,
+        recognizedText
+      );
+      
+      // Step 6: Validate and return
+      console.log('✅ Validation complete');
+      return {
+        success: true,
+        data: reconstructedTable,
+        metadata: {
+          rows: tableStructure.rows.length,
+          columns: tableStructure.columns.length,
+          processingTime: Date.now() - startTime,
+          averageConfidence: this.calculateAverageConfidence(recognizedText)
+        }
+      };
+      
+    } catch (error) {
+      console.error('❌ OCR Pipeline error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+  
+  calculateAverageConfidence(recognizedText) {
+    const total = recognizedText.reduce((sum, item) => sum + item.confidence, 0);
+    return total / recognizedText.length;
+  }
+}
+
+export default new OCRPipeline();
+2. ExcelExporter.js - Structure-Preserving Export
+javascriptimport * as XLSX from 'xlsx';
+import RNFS from 'react-native-fs';
+
+class ExcelExporter {
+  async exportToExcel(extractedData, fileName) {
+    try {
+      // Create workbook
+      const workbook = XLSX.utils.book_new();
+      
+      // Build 2D array maintaining EXACT structure
+      const worksheetData = [
+        extractedData.headers,  // Header row
+        ...extractedData.data.map(row => 
+          row.cells.map(cell => cell.text || '')  // Preserve empty cells
+        )
+      ];
+      
+      // Create worksheet from 2D array
+      const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+      
+      // Apply formatting
+      this.formatWorksheet(worksheet, extractedData);
+      
+      // Add worksheet to workbook
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Machine Readings');
+      
+      // Write to file
+      const wbout = XLSX.write(workbook, { 
+        type: 'base64', 
+        bookType: 'xlsx',
+        cellStyles: true 
+      });
+      
+      const filePath = `${RNFS.DocumentDirectoryPath}/${fileName}.xlsx`;
+      await RNFS.writeFile(filePath, wbout, 'base64');
+      
+      return {
+        success: true,
+        filePath
+      };
+      
+    } catch (error) {
+      console.error('Excel export error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+  
+  formatWorksheet(worksheet, extractedData) {
+    const range = XLSX.utils.decode_range(worksheet['!ref']);
+    
+    // Format header row (row 0)
+    for (let col = range.s.c; col <= range.e.c; col++) {
+      const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+      if (worksheet[cellAddress]) {
+        worksheet[cellAddress].s = {
+          font: { bold: true, sz: 12, color: { rgb: 'FFFFFF' } },
+          fill: { fgColor: { rgb: '1976D2' } },
+          alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+          border: this.getCellBorder()
+        };
+      }
+    }
+    
+    // Format data cells
+    for (let row = range.s.r + 1; row <= range.e.r; row++) {
+      for (let col = range.s.c; col <= range.e.c; col++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+        
+        if (!worksheet[cellAddress]) {
+          // Create empty cell to maintain structure
+          worksheet[cellAddress] = { t: 's', v: '' };
+        }
+        
+        // Get confidence for this cell
+        const cellData = extractedData.data[row - 1]?.cells[col];
+        const confidence = cellData?.confidence || 0;
+        
+        worksheet[cellAddress].s = {
+          alignment: { 
+            horizontal: col === 0 ? 'left' : 'right',  // Machine names left, numbers right
+            vertical: 'center',
+            wrapText: false
+          },
+          border: this.getCellBorder(),
+          fill: { fgColor: { rgb: this.getConfidenceColor(confidence) } }
+        };
+      }
+    }
+    
+    // Set column widths
+    worksheet['!cols'] = extractedData.headers.map((header, idx) => ({
+      wch: idx === 0 ? 35 : 15  // First column wider for machine names
+    }));
+    
+    // Set row heights
+    worksheet['!rows'] = Array(range.e.r + 1).fill({ hpt: 20 });
+    worksheet['!rows'][0] = { hpt: 25 };  // Header row taller
+  }
+  
+  getCellBorder() {
+    return {
+      top: { style: 'thin', color: { rgb: '000000' } },
+      bottom: { style: 'thin', color: { rgb: '000000' } },
+      left: { style: 'thin', color: { rgb: '000000' } },
+      right: { style: 'thin', color: { rgb: '000000' } }
+    };
+  }
+  
+  getConfidenceColor(confidence) {
+    if (confidence >= 0.9) return 'D4EDDA';  // Light green
+    if (confidence >= 0.7) return 'FFF3CD';  // Light yellow
+    return 'F8D7DA';  // Light red
+  }
+}
+
+export default new ExcelExporter();
+
+🎨 UI/UX DESIGN SPECIFICATIONS
+Design System
+javascript// colors.js
+export const COLORS = {
+  // Primary palette
+  primary: '#1976D2',      // Deep Blue
+  primaryLight: '#63A4FF',
+  primaryDark: '#004BA0',
+  
+  // Secondary palette
+  secondary: '#00897B',    // Teal
+  secondaryLight: '#4EBAAA',
+  secondaryDark: '#005B4F',
+  
+  // Accent
+  accent: '#FF6F00',       // Orange
+  accentLight: '#FFA040',
+  accentDark: '#C43E00',
+  
+  // Neutrals
+  background: '#F5F5F5',
+  surface: '#FFFFFF',
+  text: '#212121',
+  textSecondary: '#757575',
+  textHint: '#BDBDBD',
+  
+  // Status colors
+  success: '#4CAF50',
+  warning: '#FFC107',
+  error: '#F44336',
+  info: '#2196F3',
+  
+  // Confidence indicators
+  confidenceHigh: '#D4EDDA',   // Light green
+  confidenceMed: '#FFF3CD',    // Light yellow
+  confidenceLow: '#F8D7DA',    // Light red
+  
+  // Borders
+  border: '#E0E0E0',
+  divider: '#EEEEEE'
+};
+
+// spacing.js
+export const SPACING = {
+  xs: 4,
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  xxl: 48
+};
+
+// fonts.js
+export const FONTS = {
+  regular: 'System',
+  medium: 'System',
+  bold: 'System',
+  sizes: {
+    xs: 12,
+    sm: 14,
+    md: 16,
+    lg: 18,
+    xl: 24,
+    xxl: 32
+  }
+};
+```
+
+### **Screen Designs**
+
+**1. Home Screen Layout**
+```
+┌─────────────────────────────────────────┐
+│  📊 SheetScan AI              ⚙️ 🔍     │  ← Header
+├─────────────────────────────────────────┤
+│                                         │
+│  📈 Statistics                          │
+│  ┌─────────┬─────────┬─────────┐       │
+│  │ Total   │ This    │ This    │       │
+│  │ Scans   │ Week    │ Month   │       │
+│  │  127    │   12    │   45    │       │
+│  └─────────┴─────────┴─────────┘       │
+│                                         │
+│  📂 Recent Scans                        │
+│  ┌─────────────┬─────────────┐         │
+│  │ [Thumbnail] │ [Thumbnail] │         │
+│  │ Machine...  │ Reading...  │         │
+│  │ 2 hours ago │ Yesterday   │         │
+│  ├─────────────┼─────────────┤         │
+│  │ [Thumbnail] │ [Thumbnail] │         │
+│  │ Weekly...   │ Monthly...  │         │
+│  │ 2 days ago  │ Last week   │         │
+│  └─────────────┴─────────────┘         │
+│                                         │
+│                              ┌────┐    │
+│                              │ 📷 │    │  ← Floating Action Button
+│                              └────┘    │
+└─────────────────────────────────────────┘
+```
+
+**2. Camera Screen Layout**
+```
+┌─────────────────────────────────────────┐
+│  ◀️ Back                    Flash: OFF  │  ← Top bar
+├─────────────────────────────────────────┤
+│                                         │
+│          [Camera Viewfinder]            │
+│                                         │
+│     ╔═══════════════════════╗          │
+│     ║                       ║          │  ← Document edges
+│     ║   [Document Area]     ║          │     detected in real-time
+│     ║                       ║          │
+│     ╚═══════════════════════╝          │
+│                                         │
+│  💡 Align document within frame        │  ← Instruction
+│                                         │
+├─────────────────────────────────────────┤
+│  🖼️ Gallery    ⚪ CAPTURE    ⚙️ Settings│  ← Bottom controls
+└─────────────────────────────────────────┘
+```
+
+**3. Table Editor Screen**
+```
+┌─────────────────────────────────────────┐
+│  ◀️ Back      Edit Table        ✓ Done  │
+├─────────────────────────────────────────┤
+│  Original Image    │    Extracted Table │  ← Split view
+│  [Thumbnail]       │                    │
+│                    │  ┌────┬─────┬────┐ │
+│  🔍 Zoom  🔄 Rotate │  │M.  │07/  │08/ │ │  ← Headers
+│                    │  ├────┼─────┼────┤ │
+│                    │  │LT..│25200│... │ │  ← Data rows
+│                    │  │🟢  │🟡   │🔴  │ │  ← Confidence
+│                    │  ├────┼─────┼────┤ │
+│                    │  │LT..│62904│... │ │
+│                    │  │🟢  │🟢   │🟡  │ │
+│                    │  └────┴─────┴────┘ │
+│                    │                    │
+│                    │  ➕ Row  ➕ Column  │  ← Add controls
+├─────────────────────────────────────────┤
+│  📄 Export          Low confidence: 3   │  ← Footer
+└─────────────────────────────────────────┘
+
+🤖 MACHINE LEARNING MODEL TRAINING GUIDE
+Training Data Collection
+javascript// Include in app: Training Data Collection Mode (optional feature)
+
+// TrainingDataScreen.js
+// Allows users to contribute training data
+
+const TrainingDataScreen = () => {
+  const [capturedImages, setCapturedImages] = useState([]);
+  const [annotations, setAnnotations] = useState([]);
+  
+  const captureForTraining = async () => {
+    // Capture image
+    const image = await camera.takePicture();
+    
+    // User manually annotates:
+    // 1. Draw bounding boxes around tables
+    // 2. Mark cell boundaries
+    // 3. Transcribe handwritten text
+    
+    // Save locally in standardized format
+    const trainingData = {
+      image: image.uri,
+      annotations: {
+        tableBounds: [...],
+        cells: [...],
+        transcriptions: [...]
+      }
+    };
+    
+    // Export as JSON for model training
+    exportTrainingData(trainingData);
+  };
+};
+Model Training Pipeline (On Computer)
+Step 1: Environment Setup (Google Colab - FREE)
+python# Run in Google Colab notebook
+
+# Install dependencies
+!pip install tensorflow==2.12.0
+!pip install opencv-python
+!pip install pillow
+!pip install matplotlib
+!pip install scikit-learn
+
+# Import libraries
+import tensorflow as tf
+import cv2
+import numpy as np
+from tensorflow import keras
+from tensorflow.keras import layers
+import matplotlib.pyplot as plt
+
+print("✅ TensorFlow version:", tf.__version__)
+print("✅ GPU Available:", tf.test.is_gpu_available())
+Step 2: Dataset Preparation
+python# Prepare training data
+# Assuming you've collected 500-1000 annotated images
+
+import json
+import os
+
+class DatasetLoader:
+    def __init__(self, data_dir):
+        self.data_dir = data_dir
+        self.images = []
+        self.annotations = []
+    
+    def load_dataset(self):
+        """Load all training images and annotations"""
+        for filename in os.listdir(self.data_dir):
+            if filename.endswith('.json'):
+                with open(os.path.join(self.data_dir, filename)) as f:
+                    data = json.load(f)
+                    
+                    # Load image
+                    img = cv2.imread(data['image'])
+                    img = cv2.resize(img, (640, 640))  # Standardize size
+                    
+                    self.images.append(img)
+                    self.annotations.append(data['annotations'])
+        
+        return np.array(self.images), self.annotations
+    
+    def preprocess_images(self, images):
+        """Preprocess for training"""
+        # Normalize to [0, 1]
+        images = images.astype('float32') / 255.0
+        return images
+
+# Load dataset
+loader = DatasetLoader('/content/training_data')
+images, annotations = loader.load_dataset()
+images = loader.preprocess_images(images)
+
+print(f"✅ Loaded {len(images)} training images")
+Step 3: Train Table Detection Model
+python# Table Structure Detection Model
+# Based on TableNet architecture
+
+def build_table_detection_model():
+    """Build model to detect table structure"""
+    
+    inputs = keras.Input(shape=(640, 640, 3))
+    
+    # Encoder (Feature extraction)
+    x = layers.Conv2D(64, 3, activation='relu', padding='same')(inputs)
+    x = layers.MaxPooling2D(2)(x)
+    x = layers.Conv2D(128, 3, activation='relu', padding='same')(x)
+    x = layers.MaxPooling2D(2)(x)
+    x = layers.Conv2D(256, 3, activation='relu', padding='same')(x)
+    x = layers.MaxPooling2D(2)(x)
+    x = layers.Conv2D(512, 3, activation='relu', padding='same')(x)
+    
+    # Decoder (Table detection)
+    x = layers.UpSampling2D(2)(x)
+    x = layers.Conv2D(256, 3, activation='relu', padding='same')(x)
+    x = layers.UpSampling2D(2)(x)
+    x = layers.Conv2D(128, 3, activation='relu', padding='same')(x)
+    x = layers.UpSampling2D(2)(x)
+    x = layers.Conv2D(64, 3, activation='relu', padding='same')(x)
+    
+    # Output: Table mask
+    outputs = layers.Conv2D(1, 1, activation='sigmoid')(x)
+    
+    model = keras.Model(inputs=inputs, outputs=outputs)
+    return model
+
+# Build and compile
+table_model = build_table_detection_model()
+table_model.compile(
+    optimizer='adam',
+    loss='binary_crossentropy',
+    metrics=['accuracy']
+)
+
+table_model.summary()
+
+# Train model
+history = table_model.fit(
+    images,
+    table_masks,  # Binary masks of table regions
+    epochs=50,
+    batch_size=16,
+    validation_split=0.2,
+    callbacks=[
+        keras.callbacks.EarlyStopping(patience=5, restore_best_weights=True),
+        keras.callbacks.ReduceLROnPlateau(patience=3)
+    ]
+)
+
+print("✅ Table detection model trained!")
+Step 4: Train Handwriting OCR Model
+python# Handwriting Recognition Model
+# Using CNN-LSTM-CTC architecture
+
+def build_handwriting_ocr_model():
+    """Build model for handwriting recognition"""
+    
+    # Input: Image patches of text (128x32)
+    inputs = keras.Input(shape=(32, 128, 1))
+    
+    # CNN layers for feature extraction
+    x = layers.Conv2D(32, (3, 3), activation='relu', padding='same')(inputs)
+    x = layers.MaxPooling2D((2, 2))(x)
+    x = layers.Conv2D(64, (3, 3), activation='relu', padding='same')(x)
+    x = layers.MaxPooling2D((2, 2))(x)
+    x = layers.Conv2D(128, (3, 3), activation='relu', padding='same')(x)
+    x = layers.MaxPooling2D((2, 2))(x)
+    
+    # Reshape for RNN
+    new_shape = ((32, -1))  # (width, features)
+    x = layers.Reshape(target_shape=new_shape)(x)
+    
+    # LSTM layers for sequence modeling
+    x = layers.Bidirectional(layers.LSTM(128, return_sequences=True))(x)
+    x = layers.Bidirectional(layers.LSTM(128, return_sequences=True))(x)
+    
+    # Output layer (character probabilities)
+    # 37 characters: 0-9, A-Z, space
+    outputs = layers.Dense(37, activation='softmax')(x)
+    
+    model = keras.Model(inputs=inputs, outputs=outputs)
+    return model
+
+# Build model
+ocr_model = build_handwriting_ocr_model()
+ocr_model.compile(
+    optimizer='adam',
+    loss='ctc_loss'  # Connectionist Temporal Classification
+)
+
+# Train
+history = ocr_model.fit(
+    text_patches,      # Image patches containing text
+    transcriptions,    # Ground truth text
+    epochs=100,
+    batch_size=32,
+    validation_split=0.2
+)
+
+print("✅ Handwriting OCR model trained!")
+Step 5: Convert to TensorFlow Lite
+python# Convert models to TFLite format for mobile deployment
+
+def convert_to_tflite(model, model_name):
+    """Convert Keras model to TFLite"""
+    
+    # Create converter
+    converter = tf.lite.TFLiteConverter.from_keras_model(model)
+    
+    # Optimize for mobile
+    converter.optimizations = [tf.lite.Optimize.DEFAULT]
+    converter.target_spec.supported_types = [tf.float16]  # Use FP16 for smaller size
+    
+    # Convert
+    tflite_model = converter.convert()
+    
+    # Save
+    with open(f'{model_name}.tflite', 'wb') as f:
+        f.write(tflite_model)
+    
+    print(f"✅ Converted {model_name} to TFLite")
+    print(f"   Size: {len(tflite_model) / 1024 / 1024:.2f} MB")
+
+# Convert all models
+convert_to_tflite(table_model, 'table_structure')
+convert_to_tflite(ocr_model, 'handwriting_ocr')
+
+# Download models from Colab
+from google.colab import files
+files.download('table_structure.tflite')
+files.download('handwriting_ocr.tflite')
+```
+
+**Step 6: Place Models in React Native App**
+```
+After training and downloading:
+
+1. Place .tflite files in:
+   SheetScanAI/src/assets/models/
+   
+2. Update android/app/build.gradle:
+   android {
+     aaptOptions {
+       noCompress "tflite"
+     }
+   }
+   
+3. Update ios/Podfile:
+   pod 'TensorFlowLiteSwift'
+
+📋 COMPLETE PACKAGE.JSON
+json{
+  "name": "SheetScanAI",
+  "version": "1.0.0",
+  "description": "Offline ML-powered document scanner for machine readings",
+  "main": "index.js",
+  "scripts": {
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "build:android:debug": "cd android && ./gradlew assembleDebug",
+    "build:android:release": "cd android && ./gradlew assembleRelease",
+    "build:ios:release": "cd ios && xcodebuild -workspace SheetScanAI.xcworkspace -scheme SheetScanAI -configuration Release",
+    "lint": "eslint .",
+    "test": "jest"
+  },
+  "dependencies": {
+    "react": "18.2.0",
+    "react-native": "0.72.6",
+    
+    "// ML & CV": "---",
+    "@tensorflow/tfjs": "^4.11.0",
+    "@tensorflow/tfjs-react-native": "^0.8.0",
+    "react-native-opencv3": "^2.0.2",
+    
+    "// Camera & Images": "---",
+    "react-native-vision-camera": "^3.6.4",
+    "react-native-image-picker": "^5.6.1",
+    "react-native-image-crop-picker": "^0.40.0",
+    "react-native-image-manipulator": "^1.0.5",
+    "react-native-fast-image": "^8.6.3",
+    
+    "// File Operations": "---",
+    "react-native-fs": "^2.20.0",
+    "react-native-share": "^10.0.0",
+    "react-native-blob-util": "^0.19.4",
+    
+    "// Export Libraries": "---",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.6.0",
+    "xlsx": "^0.18.5",
+    "exceljs": "^4.3.0",
+    "docx": "^8.5.0",
+    "papaparse": "^5.4.1",
+    
+    "// Storage": "---",
+    "@react-native-async-storage/async-storage": "^1.19.3",
+    "react-native-mmkv": "^2.10.2",
+    
+    "// Navigation": "---",
+    "@react-navigation/native": "^6.1.9",
+    "@react-navigation/native-stack": "^6.9.17",
+    "@react-navigation/bottom-tabs": "^6.5.11",
+    "react-native-screens": "^3.27.0",
+    "react-native-safe-area-context": "^4.7.4",
+    
+    "// UI Components": "---",
+    "react-native-reanimated": "^3.5.4",
+    "react-native-gesture-handler": "^2.13.4",
+    "react-native-vector-icons": "^10.0.2",
+    "react-native-svg": "^13.14.0",
+    "react-native-linear-gradient": "^2.8.3",
+    "react-native-paper": "^5.10.6",
+    
+    "// Utilities": "---",
+    "react-native-permissions": "^3.10.1",
+    "react-native-device-info": "^10.11.0",
+    "react-native-haptic-feedback": "^2.2.0",
+    "react-native-print": "^0.11.0",
+    "date-fns": "^2.30.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.2",
+    "@babel/runtime": "^7.23.2",
+    "@react-native-community/eslint-config": "^3.2.0",
+    "babel-plugin-module-resolver": "^5.0.0",
+    "eslint": "^8.51.0",
+    "jest": "^29.7.0",
+    "metro-react-native-babel-preset": "^0.77.0",
+    "prettier": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=16",
+    "npm": ">=8"
+  }
+}
+
+🚀 BUILD & DEPLOYMENT INSTRUCTIONS
+Android Build (FREE)
+bash# Step 1: Generate release keystore (one-time)
+cd android/app
+keytool -genkeypair -v -storetype PKCS12 -keystore release.keystore -alias release -keyalg RSA -keysize 2048 -validity 10000
+
+# Step 2: Configure signing
+# Edit android/gradle.properties:
+MYAPP_RELEASE_STORE_FILE=release.keystore
+MYAPP_RELEASE_KEY_ALIAS=release
+MYAPP_RELEASE_STORE_PASSWORD=your_password
+MYAPP_RELEASE_KEY_PASSWORD=your_password
+
+# Step 3: Build release APK
+cd android
+./gradlew assembleRelease
+
+# Output: android/app/build/outputs/apk/release/app-release.apk
+
+# Step 4: Build AAB for Play Store
+./gradlew bundleRelease
+
+# Output: android/app/build/outputs/bundle/release/app-release.aab
+iOS Build (Requires Mac)
+bash# Step 1: Install dependencies
+cd ios
+pod install
+
+# Step 2: Open Xcode
+open SheetScanAI.xcworkspace
+
+# Step 3: Configure signing
+# In Xcode: Select target -> Signing & Capabilities -> Team
+
+# Step 4: Archive
+# Product -> Archive -> Distribute App
+
+# Or command line:
+xcodebuild -workspace SheetScanAI.xcworkspace \
+           -scheme SheetScanAI \
+           -configuration Release \
+           -archivePath SheetScanAI.xcarchive \
+           archive
+
+📚 COMPLETE README.md TEMPLATE
+markdown# SheetScan AI - Offline ML Document Scanner
+
+Production-ready mobile app for scanning and digitizing handwritten machine reading sheets using advanced ML/CV.
+
+## ✨ Features
+
+- 🤖 **100% Offline AI** - All ML models run on device
+- ✍️ **Handwriting Recognition** - Trained on machine reading sheets
+- 📊 **Table Structure Preservation** - Maintains exact column/row layout
+- 📄 **Multiple Export Formats** - PDF, Excel, Word, CSV, JSON
+- 🔒 **Complete Privacy** - Data never leaves device
+- ⚡ **Fast Processing** - 2-5 seconds per scan
+- 🎨 **Beautiful UI** - Modern Material Design
+- 💯 **Zero Cost** - No subscriptions or API fees
+
+## 🛠️ Tech Stack
+
+- React Native CLI
+- TensorFlow Lite (Offline ML)
+- OpenCV (Computer Vision)
+- Custom trained models
+
+## 📱 Installation
+
+### Prerequisites
+
+- Node.js 16+
+- React Native CLI
+- Android Studio (for Android)
+- Xcode (for iOS, Mac only)
+
+### Setup
+```bash
+# Clone repository
+git clone https://github.com/yourusername/SheetScanAI.git
+cd SheetScanAI
+
+# Install dependencies
+npm install
+
+# iOS only
+cd ios && pod install && cd ..
+
+# Run on Android
+npm run android
+
+# Run on iOS
+npm run ios
+```
+
+## 🏗️ Build for Production
+
+### Android
+```bash
+# Debug APK
+npm run build:android:debug
+
+# Release APK
+npm run build:android:release
+
+# Output: android/app/build/outputs/apk/release/app-release.apk
+```
+
+### iOS
+```bash
+# Requires Mac with Xcode
+npm run build:ios:release
+```
+
+## 📖 Usage
+
+1. **Capture**: Point camera at machine reading sheet
+2. **Process**: AI extracts table structure and text
+3. **Review**: Edit any incorrect recognitions
+4. **Export**: Choose format (Excel/PDF/Word)
+5. **Share**: Send via WhatsApp, Email, etc.
+
+## 🎯 Accuracy
+
+- Printed text: 95-99%
+- Clear handwriting: 85-95%
+- Messy handwriting: 70-85%
+
+## 🔧 Configuration
+
+Edit `src/constants/config.js`:
+```javascript
+export const CONFIG = {
+  OCR_CONFIDENCE_THRESHOLD: 0.7,
+  MAX_IMAGE_SIZE: 1920,
+  SUPPORTED_FORMATS: ['pdf', 'xlsx', 'docx', 'csv'],
+  // ...
+};
+```
+
+## 📝 License
+
+MIT License - Feel free to use commercially
+
+## 🤝 Contributing
+
+Contributions welcome! Please open an issue first.
+
+## 📧 Support
+
+For issues: [GitHub Issues](https://github.com/yourusername/SheetScanAI/issues)
+
+---
+
+Made with ❤️ using React Native & TensorFlow Lite
+
+🎯 FINAL DELIVERABLES CHECKLIST
+When you receive the code from Claude Code, ensure it includes:
+✅ Complete source code with all screens (12 screens)
+✅ ML/CV pipeline with TFLite integration
+✅ OpenCV preprocessing implementation
+✅ Table structure detection and preservation
+✅ Export functionality for PDF/Excel/Word/CSV
+✅ All 4 TFLite models included in assets
+✅ Comprehensive navigation setup
+✅ Beautiful UI following Material Design
+✅ Local storage implementation
+✅ Share functionality working
+✅ Permissions handling complete
+✅ Build scripts for Android & iOS
+✅ README.md with full documentation
+✅ package.json with all dependencies
+✅ Model training guide (Python notebooks)
+✅ Testing instructions
+
+And also add the editable option like when done with the extraction is user wants to edit the extracted data the use should be able to do it and same with when user wants to enter more data along with that extracted data ok
+and we will be developing this in modules and you will only tell me when i have to train the madels of tf and cv from somewhere cpu is or from google colab ok 
