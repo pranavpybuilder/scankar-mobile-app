@@ -14,10 +14,15 @@ class OCRPipeline {
       await ModelLoader.initialize();
 
       onProgress({phase: 'preprocess', progress: 20});
-      const preprocessed = await OpenCVService.preprocessImage(imageUri, preprocessOptions);
+      const preprocessed = await OpenCVService.preprocessImage(
+        imageUri,
+        preprocessOptions,
+      );
 
       onProgress({phase: 'table-detection', progress: 45});
-      const tableStructure = await TableStructureModel.detectTable(preprocessed);
+      const tableStructure = await TableStructureModel.detectTable(
+        preprocessed,
+      );
 
       onProgress({phase: 'text-detection', progress: 65});
       const textRegions = await TextDetectionModel.detectTextInCells(
@@ -33,7 +38,10 @@ class OCRPipeline {
       );
 
       onProgress({phase: 'reconstruction', progress: 93});
-      const reconstructed = TableReconstructor.buildTable(tableStructure, recognizedText);
+      const reconstructed = TableReconstructor.buildTable(
+        tableStructure,
+        recognizedText,
+      );
       const validated = StructureValidator.validate(reconstructed);
 
       onProgress({phase: 'validation', progress: 100});
@@ -42,11 +50,16 @@ class OCRPipeline {
         success: true,
         data: validated,
         metadata: {
+          modelRuntime: ModelLoader.getRuntimeStatus(),
           processingTimeMs: Date.now() - startTime,
           rows: validated.tableStructure.rows,
           columns: validated.tableStructure.columns,
           overallConfidence: validated.metadata.overallConfidence,
           preprocess: preprocessed.userAdjustments,
+          preprocessNative: preprocessed.native,
+          preprocessTransforms: preprocessed.transforms,
+          tableDetectionMode: tableStructure?.detector?.mode || 'unknown',
+          tableDetectionConfidence: tableStructure?.detector?.confidence || 0,
         },
       };
     } catch (error) {

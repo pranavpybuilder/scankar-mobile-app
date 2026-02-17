@@ -1,16 +1,41 @@
+import TFLiteRuntime from './TFLiteRuntime';
+
 class ModelLoader {
   constructor() {
     this.loaded = false;
+    this.runtimeStatus = TFLiteRuntime.getStatus();
   }
 
   async initialize() {
     if (this.loaded) {
       return true;
     }
-    // Keep this explicit so model-path replacement in future modules is isolated.
-    await new Promise(resolve => setTimeout(resolve, 200));
+    this.runtimeStatus = await TFLiteRuntime.initialize();
     this.loaded = true;
     return true;
+  }
+
+  getRuntimeStatus() {
+    return this.runtimeStatus || TFLiteRuntime.getStatus();
+  }
+
+  isRuntimeAvailable() {
+    return Boolean(this.getRuntimeStatus()?.available);
+  }
+
+  async inferTableStructure(preprocessedImage) {
+    await this.initialize();
+    return TFLiteRuntime.inferTableStructure(preprocessedImage);
+  }
+
+  async detectTextInCells(preprocessedImage, cells) {
+    await this.initialize();
+    return TFLiteRuntime.detectTextInCells(preprocessedImage, cells);
+  }
+
+  async recognizeHandwriting(preprocessedImage, textRegions) {
+    await this.initialize();
+    return TFLiteRuntime.recognizeHandwriting(preprocessedImage, textRegions);
   }
 }
 

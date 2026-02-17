@@ -58,6 +58,8 @@ class TableReconstructor {
         scanDate: new Date().toISOString(),
         overallConfidence,
         lowConfidenceCells,
+        detector: tableStructure?.detector || null,
+        bounds: tableStructure?.bounds || null,
       },
     };
   }

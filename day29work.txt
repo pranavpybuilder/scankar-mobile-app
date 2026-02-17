@@ -1,0 +1,26 @@
+[2026-02-17 04:25:25] Started: user requested app run help, lint/config cleanup, then Module 3.
+[2026-02-17 04:25:25] Resolved workspace path to C:\Users\Maintenance\Downloads\SCANKAR.
+[2026-02-17 04:27:21] New chat: start run setup + lint baseline cleanup + Module 3 implementation.
+[2026-02-17 05:02:33] Read prompt.txt + README.md module plan; confirmed Module 3 scope = real OpenCV preprocessing integration + deterministic table-grid detection.
+[2026-02-17 05:02:33] Added src/services/table/DeterministicGridDetector.js with deterministic bounds/rows/columns/cells builder + native result normalizer.
+[2026-02-17 05:02:33] Updated src/services/cv/OpenCVService.js to: normalize fallback dimensions from crop/rotation/perspective, attach tableBoundsHint, and expose detectTableGrid() with native-bridge fallback to deterministic detector.
+[2026-02-17 05:02:33] Updated src/services/ml/TableStructureModel.js to consume OpenCVService.detectTableGrid(), keep detector metadata/bounds, and generate compatible seed headers/rows for current placeholder OCR stage.
+[2026-02-17 05:02:33] Updated src/services/ml/TextDetectionModel.js with size-aware text-region bbox insets.
+[2026-02-17 05:02:33] Updated src/services/table/TableReconstructor.js to persist detector + bounds metadata in extracted document metadata.
+[2026-02-17 05:02:33] Updated src/services/ocr/OCRPipeline.js metadata with preprocessNative/preprocessTransforms/tableDetectionMode/tableDetectionConfidence.
+[2026-02-17 05:02:33] Updated README.md status line: Module 3 in progress (deterministic detector + OpenCV hooks).
+[2026-02-17 05:02:33] Validation run: cmd /c npx eslint on touched files executed; current workspace still has broad pre-existing Prettier/lint debt, so full lint is not clean yet.
+[2026-02-17 05:04:45] Minor follow-up: adjusted src/services/ml/TableStructureModel.js seed-row mapping variable names to avoid no-shadow warning in lint output.
+[2026-02-17 05:05:45] Minor follow-up: formatted TableStructureModel seed-row line to satisfy that file's current eslint check.
+[2026-02-17 05:07:10] Formatting pass: ran npx prettier --write on all touched JS/MD files from this Module 3 task (day29work.txt skipped by prettier parser limits).
+[2026-02-17 05:07:10] Validation pass: eslint now clean on touched Module 3 files (OpenCVService/TableStructureModel/TextDetectionModel/OCRPipeline/TableReconstructor/DeterministicGridDetector).
+[2026-02-17 05:15:17] Started Module 4 (next module): TFLite runtime integration with bundled model descriptors and staged fallback behavior.
+[2026-02-17 05:15:17] Updated src/constants/config.js with CONFIG.TFLITE model config (asset dir + model filenames).
+[2026-02-17 05:15:17] Added src/services/ml/TFLiteRuntime.js runtime adapter: native-module discovery, model path probing, availability status, staged inference entry points.
+[2026-02-17 05:15:17] Updated src/services/ml/ModelLoader.js to initialize/query TFLiteRuntime and expose inference helpers for table/text/ocr stages.
+[2026-02-17 05:15:17] Updated src/services/ml/TableStructureModel.js to prefer runtime table-structure inference when available, otherwise fallback to OpenCV deterministic grid.
+[2026-02-17 05:15:17] Updated src/services/ml/TextDetectionModel.js to consume runtime text-region results when available, with per-cell fallback bboxes.
+[2026-02-17 05:15:17] Updated src/services/ml/HandwritingOCRModel.js to consume runtime recognitions when available, with deterministic fallback recognitions.
+[2026-02-17 05:15:17] Updated src/services/ocr/OCRPipeline.js metadata to include ModelLoader runtime status for traceability.
+[2026-02-17 05:15:17] Updated README.md status: Module 3 complete, Module 4 in progress, plus explicit UI/icon timing section.
+[2026-02-17 05:41:57] Module 4 formatting + validation pass complete on touched files (prettier + targeted eslint clean).

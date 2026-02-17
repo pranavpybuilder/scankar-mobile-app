@@ -12,4 +12,14 @@ export const CONFIG = {
     'reconstruction',
     'validation',
   ],
+  TFLITE: {
+    enabled: true,
+    modelAssetDir: 'models',
+    models: {
+      tableStructure: 'table_structure.tflite',
+      textDetection: 'text_detection.tflite',
+      handwritingOCR: 'handwriting_ocr.tflite',
+      imageEnhancement: 'image_enhancement.tflite',
+    },
+  },
 };

@@ -6,7 +6,9 @@ Offline-first mobile app for scanning handwritten machine-reading sheets with st
 
 - Module 1 complete: app foundation, navigation, editable extracted table, export flow
 - Module 2 complete: real camera capture, crop/rotate/perspective UI, preprocessing options wired into OCR pipeline
-- Runtime dependency note: TF/OpenCV native runtime packages are deferred to Module 3/4 to keep the current baseline installable on React Native 0.72.
+- Module 3 complete: deterministic table-grid detector + OpenCV bridge hooks for native preprocessing/grid detection
+- Module 4 in progress: TFLite runtime integration with bundled model descriptors + runtime/fallback orchestration
+- Runtime dependency note: native TF/OpenCV bridges can be wired incrementally while keeping JS fallbacks functional.
 
 ## What Is Working Now
 
@@ -65,6 +67,11 @@ If Android run fails with `adb is not recognized`, add Android SDK `platform-too
 3. Module 3: real OpenCV preprocessing + deterministic table grid detection
 4. Module 4: TFLite runtime integration with bundled models
 5. Module 5: validation hardening, performance tuning, release readiness
+
+## UI And Icon Timing
+
+- UI polish pass (visual redesign and interaction refinement) starts right after Module 4 runtime wiring is stable.
+- App icon design/export starts in the same UI pass, then final app-icon replacement is done before release build packaging.
 
 ## When To Train Models
 
